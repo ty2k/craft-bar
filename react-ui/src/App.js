@@ -46,24 +46,9 @@ function App() {
             ? 'Fetching message from API'
             : message}
         </strong>{' »'}</p>
-        <p><a
-          className="App-link"
-          href="https://github.com/mars/heroku-cra-node"
-        >
-          React + Node deployment on Heroku
-        </a></p>
-        <p><a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a></p>
       </header>
     </div>
   );
-
 }
 
 export default App;
