@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Beer from './Beer';
+import Spinner from '../components/Spinner';
 
-function App() {
+function BeerList() {
   const [message, setMessage] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
+  const [beers, setBeers] = useState([]);
   const [url, setUrl] = useState('/api');
 
   const fetchData = useCallback(() => {
@@ -16,7 +17,7 @@ function App() {
         return response.json();
       })
       .then(json => {
-        console.log(json)
+        setBeers(json.beers);
         setMessage(`${json.beers.length} beers and counting!`);
         setIsFetching(false);
       }).catch(e => {
@@ -31,25 +32,15 @@ function App() {
   }, [fetchData]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        { process.env.NODE_ENV === 'production' ?
-            <p>
-              This is a production build from create-react-app.
-            </p>
-          : <p>
-              Edit <code>src/App.js</code> and save to reload.
-            </p>
-        }
-        <p>{'« '}<strong>
-          {isFetching
-            ? 'Counting beers...'
-            : message}
-        </strong>{' »'}</p>
-      </header>
+    <div className="BeerList">
+      <p><strong>{isFetching ? 'Counting beers...' : message}</strong></p>
+      <div>
+        {isFetching
+          ? <Spinner/>
+          : beers.map(beer => <Beer beer={beer}/>)}
+      </div>
     </div>
   );
 }
 
-export default App;
+export default BeerList;
