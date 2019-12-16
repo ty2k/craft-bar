@@ -16,7 +16,8 @@ function App() {
         return response.json();
       })
       .then(json => {
-        setMessage(json.message);
+        console.log(json)
+        setMessage(`${json.beers.length} beers and counting!`);
         setIsFetching(false);
       }).catch(e => {
         setMessage(`API call failed: ${e}`);
@@ -43,7 +44,7 @@ function App() {
         }
         <p>{'« '}<strong>
           {isFetching
-            ? 'Fetching message from API'
+            ? 'Counting beers...'
             : message}
         </strong>{' »'}</p>
       </header>

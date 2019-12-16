@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+const { callAPI } = require('./api-caller')
 
 // Node cluster dependencies
 const cluster = require('cluster')
@@ -29,8 +30,17 @@ if (!isDev && cluster.isMaster) {
 
   // Answer API requests
   app.get('/api', (req, res) => {
-    res.set('Content-Type', 'application/json')
-    res.send('{"message":"Hello from /api in Express!"}')
+    callAPI('https://catalogue.data.gov.bc.ca/api/3/action/datastore_search?resource_id=79cfd06f-8f3e-41b6-a411-4b843ee39236&q=beer')
+      .then(response => {
+        const beers = response.result.records.filter(
+          product => product.ITEM_CATEGORY_NAME === 'Beer'
+        )
+
+        res.json({ beers })
+      })
+      .catch(error => {
+        res.send(error)
+      })
   })
 
   // All remaining requests return the React app, so it can handle routing
