@@ -1,5 +1,10 @@
+// Server
+require('dotenv').config()
 const express = require('express')
 const path = require('path')
+const bodyParser = require('body-parser')
+const bcrypt = require('bcrypt')
+const cookieSession = require('cookie-session')
 const { callAPI } = require('./api-caller')
 
 // Node cluster dependencies
@@ -9,6 +14,10 @@ const numCPUs = require('os').cpus().length
 // Environment variables
 const isDev = process.env.NODE_ENV !== 'production'
 const PORT = process.env.PORT || 5000
+const PASSWORD_HASH = process.env.PASSWORD_HASH
+const COOKIE_KEY_1 = process.env.COOKIE_KEY_1
+const COOKIE_KEY_2 = process.env.COOKIE_KEY_2
+const AUTH_TOKEN = process.env.AUTH_TOKEN
 
 // Node cluster implementation to enable multi-processing across cores
 if (!isDev && cluster.isMaster) {
@@ -25,8 +34,9 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express()
 
-  // Priority serve any static files
+  // Middleware
   app.use(express.static(path.resolve(__dirname, '../react-ui/build')))
+  app.use(bodyParser.urlencoded({ extended: true }))
 
   // Answer API requests
   app.get('/api', (req, res) => {
@@ -41,6 +51,68 @@ if (!isDev && cluster.isMaster) {
       .catch(error => {
         res.send(error)
       })
+  })
+
+  // Admin routes
+  // Set up session cookies
+  app.use(cookieSession({
+    name: 'session',
+    keys: [COOKIE_KEY_1, COOKIE_KEY_2],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }))
+
+  // Login POST
+  app.post('/login', (req, res) => {
+    if (req.body && req.body.username && req.body.username) {
+      // If password hashes match, supply the authentication token
+      if (bcrypt.compareSync(req.body.password, PASSWORD_HASH)) {
+        console.log('Authenticated')
+        req.session.authToken = AUTH_TOKEN
+        res.json({ auth: true })
+      } else {
+        console.log('Password mismatch')
+        res.json({ authError: true })
+      }
+    } else {
+      res.json({ authError: true })
+    }
+  })
+
+  // Logout POST
+  app.post('/logout', (req, res) => {
+    console.log('Logged out')
+    req.session = null
+    res.json({ auth: false, logout: true })
+  })
+
+  // Authentication check GET
+  app.get('/check-auth', (req, res) => {
+    let auth
+    console.log('Checking auth...')
+    console.log('Cookie: ', req.session.headers)
+
+    // Check for session
+    if (req.session) {
+      console.log('req.session present...')
+
+      // Check for data on session object
+      if (req.session.isPopulated) {
+        console.log('Session data: ', req.session)
+      } else {
+        console.log('No session data present in req.session.')
+      }
+
+      // Check for authentication token
+      if (req.session.authToken) {
+        console.log('Authentication token present...')
+        if (req.session.authToken === AUTH_TOKEN) {
+          console.log('Auth token match!')
+          auth = true
+        }
+      }
+    }
+
+    auth ? res.json({ auth }) : res.json({ auth: false })
   })
 
   // All remaining requests return the React app, so it can handle routing
