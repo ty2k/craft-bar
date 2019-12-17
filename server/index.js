@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const bcrypt = require('bcrypt')
 const cookieSession = require('cookie-session')
 const { callAPI } = require('./api-caller')
@@ -35,8 +36,10 @@ if (!isDev && cluster.isMaster) {
   const app = express()
 
   // Middleware
+  app.use(cors())
   app.use(express.static(path.resolve(__dirname, '../react-ui/build')))
-  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({extended: true}))
 
   // Answer API requests
   app.get('/api', (req, res) => {
@@ -63,18 +66,20 @@ if (!isDev && cluster.isMaster) {
 
   // Login POST
   app.post('/login', (req, res) => {
-    if (req.body && req.body.username && req.body.username) {
+    console.log(req.body)
+    if (req.body && req.body.username && req.body.password) {
       // If password hashes match, supply the authentication token
-      if (bcrypt.compareSync(req.body.password, PASSWORD_HASH)) {
+      if (req.body.username === 'admin' &&
+          bcrypt.compareSync(req.body.password, PASSWORD_HASH)) {
         console.log('Authenticated')
         req.session.authToken = AUTH_TOKEN
-        res.json({ auth: true })
+        res.json({ auth: true, token: AUTH_TOKEN })
       } else {
         console.log('Password mismatch')
-        res.json({ authError: true })
+        res.status(401).end()
       }
     } else {
-      res.json({ authError: true })
+      res.status(401).end()
     }
   })
 
