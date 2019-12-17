@@ -28,6 +28,18 @@
   color: #61dafb;
 }
 
+.App-name {
+  font-size: 100px;
+  color: #fff;
+  text-shadow:#fff 1px 1px 0,
+  #f1f1f1 2px 2px 0,
+  #f2f2f2 3px 3px 0,
+  #f3f3f3 4px 4px 0,
+  #f4f4f4 5px 5px 0,
+  #f5f5f5 6px 6px 0;
+  transform: rotate(-4deg) rotateX(10deg) skewX(2deg);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(-15deg);
