@@ -40,7 +40,10 @@ const Logo = styled.img`
 `;
 
 const Error = styled.div`
-  background-color: red;
+  background-color: rgba(197, 0, 0, 1);
+  color: #fff;
+  margin: 1em;
+  padding: 1em;
 `;
 
 export { Form, Input, Button, Logo, Card, Error };
