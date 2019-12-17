@@ -19,7 +19,7 @@ function Login(props) {
       username,
       password
     }
-    axios.post("http://localhost:5000/login", requestBody)
+    axios.post("/login", requestBody)
       .then(result => {
         if (result.status === 200) {
           setAuthTokens(result.data);
@@ -45,7 +45,7 @@ function Login(props) {
           onChange={e => {
             setUsername(e.target.value);
           }}
-          placeholder="email"
+          placeholder="username"
         />
         <Input
           type="password"
