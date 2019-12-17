@@ -6,7 +6,7 @@ function BeerList() {
   const [message, setMessage] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const [beers, setBeers] = useState([]);
-  const [url, setUrl] = useState('/api');
+  const [url] = useState('/api');
 
   const fetchData = useCallback(() => {
     fetch(url)

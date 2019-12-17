@@ -39,7 +39,7 @@ if (!isDev && cluster.isMaster) {
   app.use(cors())
   app.use(express.static(path.resolve(__dirname, '../react-ui/build')))
   app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({extended: true}))
+  app.use(bodyParser.urlencoded({ extended: true }))
 
   // Answer API requests
   app.get('/api', (req, res) => {
