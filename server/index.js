@@ -40,6 +40,11 @@ if (!isDev && cluster.isMaster) {
   app.use(express.static(path.resolve(__dirname, '../react-ui/build')))
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(cookieSession({
+    name: 'session',
+    keys: [COOKIE_KEY_1, COOKIE_KEY_2],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }))
 
   // Answer API requests
   app.get('/api', (req, res) => {
@@ -57,16 +62,8 @@ if (!isDev && cluster.isMaster) {
   })
 
   // Admin routes
-  // Set up session cookies
-  app.use(cookieSession({
-    name: 'session',
-    keys: [COOKIE_KEY_1, COOKIE_KEY_2],
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }))
-
   // Login POST
   app.post('/login', (req, res) => {
-    console.log(req.body)
     if (req.body && req.body.username && req.body.password) {
       // If password hashes match, supply the authentication token
       if (req.body.username === 'admin' &&
